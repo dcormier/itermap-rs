@@ -1,0 +1,26 @@
+[package]
+name = "itermap"
+authors = ["Daniel Cormier"]
+version = "0.1.0"
+edition = "2018"
+resolver = "2"
+description = "Iterator tools for maps (`HashMap`, `BTreeMap`, etc.)"
+documentation = "https://docs.rs/itermap"
+repository = "https://github.com/dcormier/itermap-rs"
+license= "Apache-2.0"
+keywords = [
+    "iterator",
+    "map",
+]
+categories = [
+    "data-structures",
+    "rust-patterns",
+]
+exclude = [
+    "check.sh"
+]
+
+[dependencies]
+
+[dev-dependencies]
+maplit = "1"
