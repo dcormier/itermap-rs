@@ -72,7 +72,13 @@
 //! [`HashMap`]: std::collections::HashMap
 //! [`BTreeMap`]: std::collections::BTreeMap
 
-use std::fmt;
+#[cfg(any(test, doctest))]
+mod tests;
+
+use core::{
+    fmt,
+    iter::{DoubleEndedIterator, FusedIterator, Iterator},
+};
 
 /// For mapping keys and/or values from maps (`HashMap`, `BTreeMap`, etc).
 struct Iter<I, F> {
@@ -93,8 +99,10 @@ where
 
 /// Maps keys (or the first element of a two-element tuple like `(K, V)`),
 /// leaving other elements intact and untouched.
+#[must_use = "iterator adaptors are lazy and do nothing unless consumed"]
 #[derive(Debug)]
 pub struct MapKeys<I, F>(Iter<I, F>);
+
 impl<I, F, K, J, V> Iterator for MapKeys<I, F>
 where
     I: Iterator<Item = (K, V)>,
@@ -111,10 +119,29 @@ where
     }
 }
 
+impl<I, F, K, J, V> DoubleEndedIterator for MapKeys<I, F>
+where
+    I: DoubleEndedIterator<Item = (K, V)>,
+    F: FnMut(K) -> J,
+{
+    fn next_back(&mut self) -> Option<Self::Item> {
+        self.0.iter.next_back().map(|(k, v)| ((self.0.op)(k), v))
+    }
+}
+
+impl<I, F, K, J, V> FusedIterator for MapKeys<I, F>
+where
+    I: FusedIterator<Item = (K, V)>,
+    F: FnMut(K) -> J,
+{
+}
+
 /// Maps values (or the second element of a two-element tuple like `(K, V)`),
 /// leaving other elements intact and untouched.
+#[must_use = "iterator adaptors are lazy and do nothing unless consumed"]
 #[derive(Debug)]
 pub struct MapValues<I, F>(Iter<I, F>);
+
 impl<I, F, K, V, W> Iterator for MapValues<I, F>
 where
     I: Iterator<Item = (K, V)>,
@@ -129,6 +156,23 @@ where
     fn size_hint(&self) -> (usize, Option<usize>) {
         self.0.iter.size_hint()
     }
+}
+
+impl<I, F, K, V, W> DoubleEndedIterator for MapValues<I, F>
+where
+    I: DoubleEndedIterator<Item = (K, V)>,
+    F: FnMut(V) -> W,
+{
+    fn next_back(&mut self) -> Option<Self::Item> {
+        self.0.iter.next_back().map(|(k, v)| (k, (self.0.op)(v)))
+    }
+}
+
+impl<I, F, K, V, W> FusedIterator for MapValues<I, F>
+where
+    I: FusedIterator<Item = (K, V)>,
+    F: FnMut(V) -> W,
+{
 }
 
 /// Adds additional methods for `Iterator`s over maps (e.g., `HashMap`,
@@ -213,114 +257,3 @@ where
         map_values(self, value_op)
     }
 }
-
-/// For testing things that intentionally will not work.
-///
-/// ----
-///
-/// Iterator<Item = T>
-///
-/// map_keys
-/// ``` compile_fail
-/// use std::collections::HashMap;
-///
-/// use itermap::IterMap;
-///
-/// let mut vec: Vec<&str> = Vec::new();
-/// vec.push("a");
-/// vec.push("b");
-///
-/// let vec: Vec<_> = vec
-///     .into_iter()
-///     .map_keys(String::from)
-///     .collect();
-/// ```
-///
-/// map_values
-/// ``` compile_fail
-/// use std::collections::HashMap;
-///
-/// use itermap::IterMap;
-///
-/// let mut vec: Vec<&str> = Vec::new();
-/// vec.push("a");
-/// vec.push("b");
-///
-/// let vec: Vec<_> = vec
-///     .into_iter()
-///     .map_values(String::from)
-///     .collect();
-/// ```
-///
-/// ----
-///
-/// Iterator<Item = (T)>
-///
-/// map_keys
-/// ``` compile_fail
-/// use std::collections::HashMap;
-///
-/// use itermap::IterMap;
-///
-/// let mut vec: Vec<(&str)> = Vec::new();
-/// vec.push(("a"));
-/// vec.push(("b"));
-///
-/// let vec: Vec<_> = vec
-///     .into_iter()
-///     .map_keys(String::from)
-///     .collect();
-/// ```
-///
-/// map_values
-/// ``` compile_fail
-/// use std::collections::HashMap;
-///
-/// use itermap::IterMap;
-///
-/// let mut vec: Vec<(&str)> = Vec::new();
-/// vec.push(("a"));
-/// vec.push(("b"));
-///
-/// let vec: Vec<_> = vec
-///     .into_iter()
-///     .map_values(String::from)
-///     .collect();
-/// ```
-/// ----
-///
-/// Iterator<Item = (T, U, V)>
-///
-/// map_keys
-/// ``` compile_fail
-/// use std::collections::HashMap;
-///
-/// use itermap::IterMap;
-///
-/// let mut vec: Vec<(&str, &str, &str)> = Vec::new();
-/// vec.push(("a", "A", "1"));
-/// vec.push(("b", "B", "2"));
-///
-/// let vec: Vec<_> = vec
-///     .into_iter()
-///     .map_keys(String::from)
-///     .collect();
-/// ```
-///
-/// map_values
-/// ``` compile_fail
-/// use std::collections::HashMap;
-///
-/// use itermap::IterMap;
-///
-/// let mut vec: Vec<(&str, &str, &str)> = Vec::new();
-/// vec.push(("a", "A", "1"));
-/// vec.push(("b", "B", "2"));
-///
-/// let vec: Vec<_> = vec
-///     .into_iter()
-///     .map_values(String::from)
-///     .collect();
-/// ```
-#[cfg(doctest)]
-pub struct Only2ElementTuples;
