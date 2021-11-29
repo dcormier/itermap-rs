@@ -148,3 +148,16 @@ fn double_ended() {
         mapped
     );
 }
+
+#[test]
+fn exact_size() {
+    let original = vec![("a", "A"), ("b", "B"), ("c", "C")];
+
+    // If this doesn't compile, `MapKeys` doesn't implement `ExactSizeIterator`
+    let len = original.clone().into_iter().map_keys(|k| k).len();
+    assert_eq!(3, len);
+
+    // If this doesn't compile, `MapValues` doesn't implement `ExactSizeIterator`
+    let len = original.into_iter().map_values(|v| v).len();
+    assert_eq!(3, len);
+}
