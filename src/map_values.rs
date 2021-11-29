@@ -54,3 +54,10 @@ where
     F: FnMut(V) -> W,
 {
 }
+
+impl<I, F, K, V, W> ExactSizeIterator for MapValues<I, F>
+where
+    I: ExactSizeIterator<Item = (K, V)>,
+    F: FnMut(V) -> W,
+{
+}
