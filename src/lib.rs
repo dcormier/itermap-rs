@@ -1,5 +1,5 @@
 //! Tools for [`Iterator`]s over maps ([`HashMap`], [`BTreeMap`], etc),
-//! or any two-element tuple.
+//! or any two-element tuple (like `(K, V)`).
 //!
 //! Just import [`IterMap`] to get extra methods on iterators.
 //!
@@ -37,7 +37,7 @@
 //!     .collect();
 //! ```
 //!
-//! You can, of course, chain both adaptors to map both keys and values:
+//! You can, of course, chain both adaptors to map keys and values independently:
 //! ```
 //! # use std::collections::HashMap;
 //! #
@@ -85,8 +85,8 @@ pub use self::{map_keys::MapKeys, map_values::MapValues};
 /// Adds additional methods for `Iterator`s over maps (e.g., `HashMap`,
 /// `BTreeMap`, etc.) and other two-element tuples (like `(K, V)`).
 pub trait IterMap<I, K, V>: Sized {
-    /// Maps map keys (or the first element of a two-element tuple like
-    /// `(K, V)`), leaving other elements intact and untouched.
+    /// Maps map keys, or the first element of a two-element tuple (like
+    /// `(K, V)`), leaving the other element intact and untouched.
     ///
     /// # Example
     /// ```
@@ -108,7 +108,7 @@ pub trait IterMap<I, K, V>: Sized {
         Fk: FnMut(K) -> L;
 
     /// Maps map values (or the second element of a two-element tuple like
-    /// `(K, V)`), leaving other elements intact and untouched.
+    /// `(K, V)`), leaving the other element intact and untouched.
     ///
     /// # Example
     /// ```

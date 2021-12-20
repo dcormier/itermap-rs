@@ -2,8 +2,8 @@ use core::iter::{DoubleEndedIterator, FusedIterator, Iterator};
 
 use crate::iter::Iter;
 
-/// Maps values (or the second element of a two-element tuple like `(K, V)`),
-/// leaving other elements intact and untouched.
+/// Maps values, or the second element of a two-element tuple (like `(K, V)`),
+/// leaving the other element intact and untouched.
 ///
 /// For use, see the documentation on [`IterMap::map_values`].
 ///
