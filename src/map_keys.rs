@@ -13,21 +13,21 @@ use crate::iter::Iter;
 pub struct MapKeys<I, F>(Iter<I, F>);
 
 impl<I, F> MapKeys<I, F> {
-    pub(super) fn new<K, V, J>(iter: I, key_op: F) -> Self
+    pub(super) fn new<K, V, L>(iter: I, key_op: F) -> Self
     where
         I: Iterator<Item = (K, V)>,
-        F: FnMut(K) -> J,
+        F: FnMut(K) -> L,
     {
         Self(Iter { iter, op: key_op })
     }
 }
 
-impl<I, F, K, J, V> Iterator for MapKeys<I, F>
+impl<I, F, K, L, V> Iterator for MapKeys<I, F>
 where
     I: Iterator<Item = (K, V)>,
-    F: FnMut(K) -> J,
+    F: FnMut(K) -> L,
 {
-    type Item = (J, V);
+    type Item = (L, V);
 
     fn next(&mut self) -> Option<Self::Item> {
         self.0.iter.next().map(|(k, v)| ((self.0.op)(k), v))
@@ -38,26 +38,26 @@ where
     }
 }
 
-impl<I, F, K, J, V> DoubleEndedIterator for MapKeys<I, F>
+impl<I, F, K, L, V> DoubleEndedIterator for MapKeys<I, F>
 where
     I: DoubleEndedIterator<Item = (K, V)>,
-    F: FnMut(K) -> J,
+    F: FnMut(K) -> L,
 {
     fn next_back(&mut self) -> Option<Self::Item> {
         self.0.iter.next_back().map(|(k, v)| ((self.0.op)(k), v))
     }
 }
 
-impl<I, F, K, J, V> FusedIterator for MapKeys<I, F>
+impl<I, F, K, L, V> FusedIterator for MapKeys<I, F>
 where
     I: FusedIterator<Item = (K, V)>,
-    F: FnMut(K) -> J,
+    F: FnMut(K) -> L,
 {
 }
 
-impl<I, F, K, J, V> ExactSizeIterator for MapKeys<I, F>
+impl<I, F, K, L, V> ExactSizeIterator for MapKeys<I, F>
 where
     I: ExactSizeIterator<Item = (K, V)>,
-    F: FnMut(K) -> J,
+    F: FnMut(K) -> L,
 {
 }

@@ -103,9 +103,9 @@ pub trait IterMap<I, K, V>: Sized {
     ///     .map_keys(String::from)
     ///     .collect();
     /// ```
-    fn map_keys<Fk, J>(self, f: Fk) -> MapKeys<I, Fk>
+    fn map_keys<Fk, L>(self, f: Fk) -> MapKeys<I, Fk>
     where
-        Fk: FnMut(K) -> J;
+        Fk: FnMut(K) -> L;
 
     /// Maps map values (or the second element of a two-element tuple like
     /// `(K, V)`), leaving other elements intact and untouched.
@@ -125,25 +125,25 @@ pub trait IterMap<I, K, V>: Sized {
     ///     .map_values(String::from)
     ///     .collect();
     /// ```
-    fn map_values<Fv, U>(self, f: Fv) -> MapValues<I, Fv>
+    fn map_values<Fv, W>(self, f: Fv) -> MapValues<I, Fv>
     where
-        Fv: FnMut(V) -> U;
+        Fv: FnMut(V) -> W;
 }
 
 impl<I, K, V> IterMap<I, K, V> for I
 where
     I: Iterator<Item = (K, V)>,
 {
-    fn map_keys<Fk, J>(self, key_op: Fk) -> MapKeys<I, Fk>
+    fn map_keys<Fk, L>(self, key_op: Fk) -> MapKeys<I, Fk>
     where
-        Fk: FnMut(K) -> J,
+        Fk: FnMut(K) -> L,
     {
         MapKeys::new(self, key_op)
     }
 
-    fn map_values<Fv, U>(self, value_op: Fv) -> MapValues<I, Fv>
+    fn map_values<Fv, W>(self, value_op: Fv) -> MapValues<I, Fv>
     where
-        Fv: FnMut(V) -> U,
+        Fv: FnMut(V) -> W,
     {
         MapValues::new(self, value_op)
     }

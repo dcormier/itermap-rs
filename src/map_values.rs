@@ -13,10 +13,10 @@ use crate::iter::Iter;
 pub struct MapValues<I, F>(Iter<I, F>);
 
 impl<I, F> MapValues<I, F> {
-    pub(super) fn new<K, V, U>(iter: I, value_op: F) -> Self
+    pub(super) fn new<K, V, W>(iter: I, value_op: F) -> Self
     where
         I: Iterator<Item = (K, V)>,
-        F: FnMut(V) -> U,
+        F: FnMut(V) -> W,
     {
         Self(Iter { iter, op: value_op })
     }
