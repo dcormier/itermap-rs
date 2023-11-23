@@ -6,20 +6,12 @@ edition = "2021"
 description = "Iterator tools for maps (`HashMap`, `BTreeMap`, etc.)"
 documentation = "https://docs.rs/itermap"
 repository = "https://github.com/dcormier/itermap-rs"
-license= "Apache-2.0"
-keywords = [
-    "iterator",
-    "map",
-]
-categories = [
-    "data-structures",
-    "rust-patterns",
-]
-exclude = [
-    "check.sh"
-]
+license = "Apache-2.0"
+keywords = ["iterator", "map"]
+categories = ["data-structures", "rust-patterns"]
+exclude = ["check.sh"]
 
 [dependencies]
 
 [dev-dependencies]
-maplit = "1"
+pretty_assertions = "1"
