@@ -72,6 +72,8 @@
 //! [`HashMap`]: std::collections::HashMap
 //! [`BTreeMap`]: std::collections::BTreeMap
 
+mod filter_keys;
+mod filter_values;
 mod iter;
 mod map_keys;
 mod map_values;

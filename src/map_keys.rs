@@ -8,7 +8,7 @@ use crate::iter::Iter;
 /// For use, see the documentation on [`IterMap::map_keys`].
 ///
 /// [`IterMap::map_keys`]: crate::IterMap::map_keys
-#[must_use = "iterator adaptors are lazy and do nothing unless consumed"]
+#[must_use = "iterators are lazy and do nothing unless consumed"]
 #[derive(Debug)]
 pub struct MapKeys<I, F>(Iter<I, F>);
 
