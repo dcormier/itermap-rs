@@ -7,11 +7,14 @@ description = "Iterator tools for maps (`HashMap`, `BTreeMap`, etc.)"
 documentation = "https://docs.rs/itermap"
 repository = "https://github.com/dcormier/itermap-rs"
 license = "Apache-2.0"
-keywords = ["iterator", "map"]
+keywords = ["iterator", "map", "filter"]
 categories = ["data-structures", "rust-patterns"]
 exclude = ["check.sh"]
 
 [dependencies]
 
 [dev-dependencies]
+map_vec = { git = "https://github.com/dcormier/map_vec.git", features = ["serde"] }
+# map_vec = { path = "../map_vec", features = ["serde"] }
+# map_vec = { version = "0.3", features = ["serde"] }
 pretty_assertions = "1"

@@ -10,27 +10,27 @@ use crate::iter::Iter;
 /// [`IterMap::map_values`]: crate::IterMap::map_values
 #[must_use = "iterator adaptors are lazy and do nothing unless consumed"]
 #[derive(Debug)]
-pub struct MapValues<I, F>(Iter<I, F>);
+pub struct MapValues<I, P>(Iter<I, P>);
 
-impl<I, F> MapValues<I, F> {
-    pub(super) fn new<K, V, W>(iter: I, value_op: F) -> Self
+impl<I, P> MapValues<I, P> {
+    pub(super) fn new<K, V, W>(iter: I, predicate: P) -> Self
     where
         I: Iterator<Item = (K, V)>,
-        F: FnMut(V) -> W,
+        P: FnMut(V) -> W,
     {
-        Self(Iter { iter, op: value_op })
+        Self(Iter { iter, predicate })
     }
 }
 
-impl<I, F, K, V, W> Iterator for MapValues<I, F>
+impl<I, P, K, V, W> Iterator for MapValues<I, P>
 where
     I: Iterator<Item = (K, V)>,
-    F: FnMut(V) -> W,
+    P: FnMut(V) -> W,
 {
     type Item = (K, W);
 
     fn next(&mut self) -> Option<Self::Item> {
-        self.0.iter.next().map(|(k, v)| (k, (self.0.op)(v)))
+        self.0.iter.next().map(|(k, v)| (k, (self.0.predicate)(v)))
     }
 
     fn size_hint(&self) -> (usize, Option<usize>) {
@@ -38,26 +38,29 @@ where
     }
 }
 
-impl<I, F, K, V, W> DoubleEndedIterator for MapValues<I, F>
+impl<I, P, K, V, W> DoubleEndedIterator for MapValues<I, P>
 where
     I: DoubleEndedIterator<Item = (K, V)>,
-    F: FnMut(V) -> W,
+    P: FnMut(V) -> W,
 {
     fn next_back(&mut self) -> Option<Self::Item> {
-        self.0.iter.next_back().map(|(k, v)| (k, (self.0.op)(v)))
+        self.0
+            .iter
+            .next_back()
+            .map(|(k, v)| (k, (self.0.predicate)(v)))
     }
 }
 
-impl<I, F, K, V, W> FusedIterator for MapValues<I, F>
+impl<I, P, K, V, W> FusedIterator for MapValues<I, P>
 where
     I: FusedIterator<Item = (K, V)>,
-    F: FnMut(V) -> W,
+    P: FnMut(V) -> W,
 {
 }
 
-impl<I, F, K, V, W> ExactSizeIterator for MapValues<I, F>
+impl<I, P, K, V, W> ExactSizeIterator for MapValues<I, P>
 where
     I: ExactSizeIterator<Item = (K, V)>,
-    F: FnMut(V) -> W,
+    P: FnMut(V) -> W,
 {
 }

@@ -1,12 +1,12 @@
 use core::fmt;
 
 /// For mapping keys and/or values from maps (`HashMap`, `BTreeMap`, etc).
-pub struct Iter<I, F> {
+pub struct Iter<I, P> {
     pub iter: I,
-    pub op: F,
+    pub predicate: P,
 }
 
-impl<I, F> fmt::Debug for Iter<I, F>
+impl<I, P> fmt::Debug for Iter<I, P>
 where
     I: fmt::Debug,
 {

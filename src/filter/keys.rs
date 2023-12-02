@@ -10,33 +10,30 @@ use crate::iter::Iter;
 /// [`IterMap::filter_keys`]: crate::IterMap::filter_keys
 #[must_use = "iterator adaptors are lazy and do nothing unless consumed"]
 #[derive(Debug)]
-pub struct FilterKeys<I, F>(Iter<I, F>);
+pub struct FilterKeys<I, P>(Iter<I, P>);
 
-impl<I, F> FilterKeys<I, F> {
-    pub(crate) fn new<K, V>(iter: I, key_op: F) -> Self
+impl<I, P> FilterKeys<I, P> {
+    pub(crate) fn new<K, V>(iter: I, predicate: P) -> Self
     where
         I: Iterator<Item = (K, V)>,
-        F: FnMut(&K) -> bool,
+        P: FnMut(&K) -> bool,
     {
-        Self(Iter { iter, op: key_op })
+        Self(Iter { iter, predicate })
     }
 }
 
-impl<I, F, K, V> Iterator for FilterKeys<I, F>
+impl<I, P, K, V> Iterator for FilterKeys<I, P>
 where
     I: Iterator<Item = (K, V)>,
-    F: FnMut(&K) -> bool,
+    P: FnMut(&K) -> bool,
 {
     type Item = (K, V);
 
     fn next(&mut self) -> Option<Self::Item> {
-        for (k, v) in self.0.iter.by_ref() {
-            if (self.0.op)(&k) {
-                return Some((k, v));
-            }
-        }
-
-        None
+        self.0
+            .iter
+            .by_ref()
+            .find(|item| (self.0.predicate)(&item.0))
     }
 
     fn size_hint(&self) -> (usize, Option<usize>) {
@@ -44,33 +41,31 @@ where
     }
 }
 
-impl<I, F, K, V> DoubleEndedIterator for FilterKeys<I, F>
+impl<I, P, K, V> DoubleEndedIterator for FilterKeys<I, P>
 where
     I: DoubleEndedIterator<Item = (K, V)>,
-    F: FnMut(&K) -> bool,
+    P: FnMut(&K) -> bool,
 {
     fn next_back(&mut self) -> Option<Self::Item> {
-        for (k, v) in self.0.iter.by_ref().rev() {
-            if (self.0.op)(&k) {
-                return Some((k, v));
-            }
-        }
-
-        None
+        self.0
+            .iter
+            .by_ref()
+            .rev()
+            .find(|item| (self.0.predicate)(&item.0))
     }
 }
 
-impl<I, F, K, V> FusedIterator for FilterKeys<I, F>
+impl<I, P, K, V> FusedIterator for FilterKeys<I, P>
 where
     I: FusedIterator<Item = (K, V)>,
-    F: FnMut(&K) -> bool,
+    P: FnMut(&K) -> bool,
 {
 }
 
-impl<I, F, K, V> ExactSizeIterator for FilterKeys<I, F>
+impl<I, P, K, V> ExactSizeIterator for FilterKeys<I, P>
 where
     I: ExactSizeIterator<Item = (K, V)>,
-    F: FnMut(&K) -> bool,
+    P: FnMut(&K) -> bool,
 {
 }
 

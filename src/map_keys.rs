@@ -10,27 +10,27 @@ use crate::iter::Iter;
 /// [`IterMap::map_keys`]: crate::IterMap::map_keys
 #[must_use = "iterators are lazy and do nothing unless consumed"]
 #[derive(Debug)]
-pub struct MapKeys<I, F>(Iter<I, F>);
+pub struct MapKeys<I, P>(Iter<I, P>);
 
-impl<I, F> MapKeys<I, F> {
-    pub(super) fn new<K, V, L>(iter: I, key_op: F) -> Self
+impl<I, P> MapKeys<I, P> {
+    pub(super) fn new<K, V, L>(iter: I, predicate: P) -> Self
     where
         I: Iterator<Item = (K, V)>,
-        F: FnMut(K) -> L,
+        P: FnMut(K) -> L,
     {
-        Self(Iter { iter, op: key_op })
+        Self(Iter { iter, predicate })
     }
 }
 
-impl<I, F, K, L, V> Iterator for MapKeys<I, F>
+impl<I, P, K, L, V> Iterator for MapKeys<I, P>
 where
     I: Iterator<Item = (K, V)>,
-    F: FnMut(K) -> L,
+    P: FnMut(K) -> L,
 {
     type Item = (L, V);
 
     fn next(&mut self) -> Option<Self::Item> {
-        self.0.iter.next().map(|(k, v)| ((self.0.op)(k), v))
+        self.0.iter.next().map(|(k, v)| ((self.0.predicate)(k), v))
     }
 
     fn size_hint(&self) -> (usize, Option<usize>) {
@@ -38,26 +38,29 @@ where
     }
 }
 
-impl<I, F, K, L, V> DoubleEndedIterator for MapKeys<I, F>
+impl<I, P, K, L, V> DoubleEndedIterator for MapKeys<I, P>
 where
     I: DoubleEndedIterator<Item = (K, V)>,
-    F: FnMut(K) -> L,
+    P: FnMut(K) -> L,
 {
     fn next_back(&mut self) -> Option<Self::Item> {
-        self.0.iter.next_back().map(|(k, v)| ((self.0.op)(k), v))
+        self.0
+            .iter
+            .next_back()
+            .map(|(k, v)| ((self.0.predicate)(k), v))
     }
 }
 
-impl<I, F, K, L, V> FusedIterator for MapKeys<I, F>
+impl<I, P, K, L, V> FusedIterator for MapKeys<I, P>
 where
     I: FusedIterator<Item = (K, V)>,
-    F: FnMut(K) -> L,
+    P: FnMut(K) -> L,
 {
 }
 
-impl<I, F, K, L, V> ExactSizeIterator for MapKeys<I, F>
+impl<I, P, K, L, V> ExactSizeIterator for MapKeys<I, P>
 where
     I: ExactSizeIterator<Item = (K, V)>,
-    F: FnMut(K) -> L,
+    P: FnMut(K) -> L,
 {
 }
