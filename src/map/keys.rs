@@ -13,7 +13,7 @@ use crate::iter::Iter;
 pub struct MapKeys<I, P>(Iter<I, P>);
 
 impl<I, P> MapKeys<I, P> {
-    pub(super) fn new<K, V, L>(iter: I, predicate: P) -> Self
+    pub(crate) fn new<K, V, L>(iter: I, predicate: P) -> Self
     where
         I: Iterator<Item = (K, V)>,
         P: FnMut(K) -> L,

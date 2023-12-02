@@ -9,17 +9,17 @@
 
 mod filter;
 mod iter;
-mod map_keys;
-mod map_values;
+mod map;
 #[cfg(any(test, doctest))]
 mod tests;
 
 use core::iter::Iterator;
 
 #[doc(hidden)]
-pub use self::filter::{FilterKeys, FilterValues};
-#[doc(hidden)]
-pub use self::{map_keys::MapKeys, map_values::MapValues};
+pub use self::{
+    filter::{FilterKeys, FilterValues},
+    map::{MapKeys, MapValues},
+};
 
 /// Adds additional methods for `Iterator`s over maps (e.g., `HashMap`,
 /// `BTreeMap`, etc.) and other two-element tuples (like `(K, V)`).
