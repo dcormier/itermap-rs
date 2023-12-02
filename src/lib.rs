@@ -10,6 +10,7 @@
 mod filter;
 mod iter;
 mod map;
+mod swap;
 #[cfg(any(test, doctest))]
 mod tests;
 
@@ -19,6 +20,7 @@ use core::iter::Iterator;
 pub use self::{
     filter::{FilterKeys, FilterValues},
     map::{MapKeys, MapValues},
+    swap::Swap,
 };
 
 /// Adds additional methods for `Iterator`s over maps (e.g., `HashMap`,
@@ -45,6 +47,7 @@ pub trait IterMap<I, K, V>: Sized {
     /// ```
     ///
     /// Any iterator of two-element tuples will work.
+    ///
     /// ```
     /// use itermap::IterMap;
     ///
@@ -84,6 +87,7 @@ pub trait IterMap<I, K, V>: Sized {
     /// ```
     ///
     /// Any iterator of two-element tuples will work.
+    ///
     /// ```
     /// use itermap::IterMap;
     ///
@@ -132,6 +136,7 @@ pub trait IterMap<I, K, V>: Sized {
     /// ```
     ///
     /// Any iterator of two-element tuples will work.
+    ///
     /// ```
     /// use itermap::IterMap;
     /// # use pretty_assertions::assert_eq;
@@ -189,6 +194,7 @@ pub trait IterMap<I, K, V>: Sized {
     /// ```
     ///
     /// Any iterator of two-element tuples will work.
+    ///
     /// ```
     /// use itermap::IterMap;
     /// # use pretty_assertions::assert_eq;
@@ -214,6 +220,73 @@ pub trait IterMap<I, K, V>: Sized {
     fn filter_values<Fv>(self, value_op: Fv) -> FilterValues<I, Fv>
     where
         Fv: FnMut(&V) -> bool;
+
+    /// Swaps the positions of iterator items like `(K, V)` so it's `(V, K)`.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// # use std::collections::HashMap;
+    /// #
+    /// use itermap::IterMap;
+    /// # use pretty_assertions::assert_eq;
+    ///
+    /// let map = HashMap::from([
+    ///     ("a", "A"),
+    ///     ("b", "B"),
+    ///     ("c", "C"),
+    ///     ("d", "D"),
+    ///     ("e", "E"),
+    /// ]);
+    ///
+    /// let swapped: HashMap<_, _> = map
+    ///     .into_iter()
+    ///     .swap()
+    ///     .collect();
+    ///
+    /// assert_eq!(
+    ///     HashMap::from([
+    ///         ("A", "a"),
+    ///         ("B", "b"),
+    ///         ("C", "c"),
+    ///         ("D", "d"),
+    ///         ("E", "e"),
+    ///     ]),
+    ///     swapped,
+    /// );
+    /// ```
+    ///
+    /// Any iterator of two-element tuples will work.
+    ///
+    /// ```
+    /// use itermap::IterMap;
+    /// # use pretty_assertions::assert_eq;
+    ///
+    /// let mut items = vec![
+    ///     ("a", "A"),
+    ///     ("b", "B"),
+    ///     ("c", "C"),
+    ///     ("d", "D"),
+    ///     ("e", "E"),
+    /// ];
+    ///
+    /// let swapped: Vec<(_, _)> = items
+    ///     .into_iter()
+    ///     .swap()
+    ///     .collect();
+    ///
+    /// assert_eq!(
+    ///     Vec::from([
+    ///         ("A", "a"),
+    ///         ("B", "b"),
+    ///         ("C", "c"),
+    ///         ("D", "d"),
+    ///         ("E", "e"),
+    ///     ]),
+    ///     swapped,
+    /// );
+    /// ```
+    fn swap(self) -> Swap<Self>;
 }
 
 impl<I, K, V> IterMap<I, K, V> for I
@@ -246,5 +319,9 @@ where
         Fv: FnMut(&V) -> bool,
     {
         FilterValues::new(self, value_op)
+    }
+
+    fn swap(self) -> Swap<Self> {
+        Swap::new(self)
     }
 }
